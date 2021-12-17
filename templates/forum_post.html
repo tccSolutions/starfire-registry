@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{post.title}}</title>
+</head>
+<body>
+{% extends 'index.html' %}
+{% block content %}
+
+<!--Reply Modal-->
+<div  id="create_reply_modal" class="modal  fade border border-solid border-light" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content ">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create Post</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body w-100">
+          <form action="{{url_for('add_reply')}}" method="POST">
+
+          <div class="mb-3">
+             {{form.created_by(class='form-control', placeholder="Whose Responding")}}
+          </div>
+          <div class="mb-3">
+            {{form.body(class='form-control')}}
+          </div>
+              {{ form.post_id( value=post.id ) }}
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+        </form>
+          {{ckeditor.load()}}
+          {{ckeditor.config(name="body", height=400)}}
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="card w-75 mx-auto">
+        <div class="card-body">
+            <h1 class="card-title">{{post.title}}</h1>
+            <h5  class="card-subtitle mb-2 text-muted">Created By: {{post.created_by}} </h5>
+            <h6  class="card-subtitle mb-2 text-muted">{{post.date}}</h6>
+            <p>{{post.body|safe}}</p>
+            <button type="button" class="btn btn-primary float-end "
+                    type="button" data-bs-toggle="modal" data-bs-target="#create_reply_modal">Reply
+            </button>
+            <div>
+        </div>
+
+    </div>
+    </div>
+                  {% for reply in post.replies %}
+    <div class="card my-2 me-1 text-center ms-auto me-5" style="width: 65%;">
+        <div class="card-body">
+            <h6>{{reply.created_by}}</h6>
+            <h6>{{reply.date}}</h6>
+            {{reply.body|safe}}
+            <button type="button" class="btn btn-primary float-end"
+                type="button" data-bs-toggle="modal" data-bs-target="#create_reply_modal">Reply
+        </button>
+        </div>
+    </div>
+    {% endfor %}
+
+
+{% endblock %}
+
+</body>
+</html>

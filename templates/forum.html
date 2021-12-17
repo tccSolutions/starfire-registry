@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forum</title>
+</head>
+<body>
+{% extends "index.html" %}
+{% block content %}
+
+<div  id="create_post_modal" class="modal  fade border border-solid border-light" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content ">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create Post</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body w-100">
+          <form action="{{url_for('forum')}}" method="POST">
+
+          <div class="mb-3">
+             {{form.title(class='form-control', placeholder="Enter Title")}}
+          </div>
+          <div class="mb-3">
+           {{form.created_by(class='form-control', placeholder="Author (That's You)")}}
+          </div>
+          <div class="mb-3">
+            {{form.body(class='form-control')}}
+          </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+        </form>
+          {{ckeditor.load()}}
+          {{ckeditor.config(name="body", height=400)}}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container  jumbotron text-center">
+    <h1 >Posts</h1>
+    <h3>
+        <button class="btn btn-dark" type="button" data-bs-toggle="modal" data-bs-target="#create_post_modal">Click Here</button>
+        To Create A Post
+    </h3>
+</div>
+<div class="container post-container">
+    {% for post in posts %}
+<div class="card mx-auto shadow rounded mt-2" style="width: 55%;">
+  <div class="card-body">
+    <h5 class="card-title">{{post.title}}</h5>
+    <h6 class="card-subtitle mb-2 text-muted">Created By: {{post.created_by}}<br>{{post.date}} </h6>
+    <p class="card-text">{{post.body[:50]|safe}}</p>
+    <a href="/forum/{{post.title}}/{{post.id}}" class="card-link">Read Post</a>
+
+  </div>
+</div>
+{% endfor %}
+</div>
+
+
+
+<script >
+    console.log("connected")
+    form_btn = document.getElementById("form_btn")
+    console.log(form_btn)
+    form_btn.onclick = function(){
+        form_btn.style.width = "25%"
+        form_btn.style.height = "auto"
+        document.getElementsByClassName("post-form")[0].style.visibility = "visible"
+        console.log("clicked")
+    }
+</script>
+
+{% endblock %}
+
+</body>
+</html>
+
