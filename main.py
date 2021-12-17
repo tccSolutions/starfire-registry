@@ -9,13 +9,13 @@ from flask_ckeditor import CKEditor
 from flask_login import UserMixin, login_user, logout_user, LoginManager, login_required, current_user
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "akldf*(Oalksf"
+app.config["DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///static/data/cars.db")
 
 # Form Settings
 ckeditor = CKEditor(app)
-app.config["SECRET_KEY"] = "akldf*(Oalksf"
 
-# Database Settings
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///static/data/cars.db")
+# Database
 db = SQLAlchemy(app)
 
 # Login Manager
@@ -34,6 +34,7 @@ today = datetime.date.today()
 year = today.year
 
 
+# database models
 class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False)
