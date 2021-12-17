@@ -15,8 +15,8 @@ ckeditor = CKEditor(app)
 app.config["SECRET_KEY"] = "akldf*(Oalksf"
 
 # Database Settings
-db = SQLAlchemy(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///static/data/cars.db")
+db = SQLAlchemy(app)
 
 # Login Manager
 login_manager = LoginManager()
