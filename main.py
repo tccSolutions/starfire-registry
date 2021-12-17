@@ -2,20 +2,56 @@ import datetime
 import os
 import gunicorn
 import psycopg2
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 from classes.forms import *
 from flask_ckeditor import CKEditor
+from flask_login import UserMixin, login_user, logout_user, LoginManager, login_required, current_user
 
 app = Flask(__name__)
+
+# Form Settings
 ckeditor = CKEditor(app)
 app.config["SECRET_KEY"] = "akldf*(Oalksf"
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///static/data/cars.db")
 
+# Database Settings
 db = SQLAlchemy(app)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
+    "DATABASE_URL", "sqlite:///static/data/cars.db")
 
+# Login Manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
+
+# Date Settings
 today = datetime.date.today()
 year = today.year
+
+
+class Users(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False, unique=True)
+    first_name = db.Column(db.String, nullable=False)
+    last_name = db.Column(db.String, nullable=False)
+
+    def __repr__(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "password": self.password,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email
+        }
 
 
 class ForumPost(db.Model):
@@ -85,19 +121,43 @@ def index():
     return render_template('index.html', year=year)
 
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    login_form = LoginForm()
+    if request.method == "POST":
+        user = Users.query.filter_by(username=login_form.username.data).first()
+        if user:
+            if user.password == login_form.password.data:
+                flash(f"Welcome {user.first_name}!")
+                login_user(user)
+                return redirect("/home")
+            else:
+                flash("Invalid Password")
+        else:
+            flash("User not found")
+    return render_template('login.html', login_form=login_form)
+
+
+@app.route("/logout", methods=["Get", "Post"])
+def logout():
+    logout_user()
+    flash("You have been logged out!")
+    return redirect(url_for('login'))
+
+
 @app.route('/forum', methods=["GET", "POST"])
 def forum():
     global posts
     posts = db.session.query(ForumPost).all()
     form = AddPostForm()
+
     if request.method == "POST":
         post = ForumPost(
             title=request.form["title"],
-            created_by=request.form["created_by"],
+            created_by=f"{current_user.first_name} {current_user.last_name}",
             body=request.form["body"],
             date=today
         )
-
         try:
             db.session.add(post)
             db.session.commit()
@@ -105,6 +165,7 @@ def forum():
             pass
         posts = db.session.query(ForumPost).all()
         return redirect('forum')
+
     return render_template('forum.html', year=year, posts=posts, form=form)
 
 
@@ -112,7 +173,7 @@ def forum():
 def forum_post(id, title):
     form = ReplyPost()
     display_post = db.session.query(ForumPost).get(id)
-    return render_template('forum_post.html', form=form, post=display_post, year=year)
+    return render_template('forum_post.html', form=form, post=display_post, year=year, current_user=current_user)
 
 
 @app.route('/add-reply', methods=["POST"])
@@ -120,7 +181,7 @@ def add_reply():
     if request.method == "POST":
         print(request.form)
         reply = Replies(
-            created_by=request.form["created_by"],
+            created_by=f"{current_user.first_name} {current_user.last_name} ",
             body=request.form["body"],
             date=today,
             post_id=request.form["post_id"]
@@ -145,16 +206,17 @@ def registry():
 @app.route('/add_car', methods=["POST"])
 def add_car():
     car = Cars(
-               year=int(request.form["year"]),
-               vin=request.form["vin"],
-               fname=request.form["fname"],
-               lname=request.form["lname"],
-               email=request.form["email"]
-               )
+        year=int(request.form["year"]),
+        vin=request.form["vin"],
+        fname=request.form["fname"],
+        lname=request.form["lname"],
+        email=request.form["email"]
+    )
     if request.method == "POST":
         db.session.add(car)
         db.session.commit()
     return redirect('registry')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
