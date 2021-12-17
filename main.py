@@ -7,10 +7,11 @@ from flask_sqlalchemy import SQLAlchemy
 from classes.forms import *
 from flask_ckeditor import CKEditor
 from flask_login import UserMixin, login_user, logout_user, LoginManager, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "akldf*(Oalksf"
-app.config["DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///static/data/cars.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///static/data/cars.db"
 
 # Form Settings
 ckeditor = CKEditor(app)
@@ -36,8 +37,8 @@ year = today.year
 
 # database models
 class Users(db.Model, UserMixin):
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False, unique=True)
     first_name = db.Column(db.String, nullable=False)
@@ -46,16 +47,15 @@ class Users(db.Model, UserMixin):
     def __repr__(self):
         return {
             "id": self.id,
-            "username": self.username,
             "password": self.password,
+            "email": self.email,
             "first_name": self.first_name,
-            "last_name": self.last_name,
-            "email": self.email
+            "last_name": self.last_name
         }
 
 
 class ForumPost(db.Model):
-    __tablename__ = 'forumpost'
+    __tablename__ = "forumpost"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, nullable=False)
     created_by = db.Column(db.String, nullable=False)
@@ -93,7 +93,7 @@ class Replies(db.Model):
 
 
 class Cars(db.Model):
-    __tablename__ = 'cars'
+
     id = db.Column(db.Integer, primary_key=True)
     year = db.Column(db.Integer, nullable=False)
     vin = db.Column(db.String, nullable=False)
@@ -123,11 +123,11 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    login_form = LoginForm()
+    login_form = UserForm()
     if request.method == "POST":
-        user = Users.query.filter_by(username=login_form.username.data).first()
+        user = Users.query.filter_by(email=login_form.email.data).first()
         if user:
-            if user.password == login_form.password.data:
+            if check_password_hash(user.password, login_form.password.data):
                 flash(f"Welcome {user.first_name}!")
                 login_user(user)
                 return redirect("/home")
@@ -143,6 +143,30 @@ def logout():
     logout_user()
     flash("You have been logged out!")
     return redirect(url_for('login'))
+
+
+@app.route("/sign-up", methods=["GET", "POST"])
+def sign_up():
+    form = UserForm()
+    if request.method == "POST":
+        user = Users.query.filter_by(email=form.email.data).first()
+        if not user:
+            if form.password.data == request.form["conf_pass"]:
+                new_user = Users(email=form.email.data,
+                                 first_name=form.first_name.data,
+                                 last_name=form.last_name.data,
+                                 password=generate_password_hash(form.password.data))
+                db.session.add(new_user)
+                db.session.commit()
+                login_user(new_user)
+                return redirect(url_for('index'))
+            else:
+                flash("Passwords do not Match")
+                redirect(url_for('sign_up'))
+        else:
+            flash("Email Already Registered.")
+            redirect(url_for('login'))
+    return render_template("sign_up.html", form=form)
 
 
 @app.route('/forum', methods=["GET", "POST"])

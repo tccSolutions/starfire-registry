@@ -51,7 +51,7 @@
     <div class="container jumbotron text-center">
       <h1>Posts</h1>
       <h3>
-        {% if current_user.authenticated %}
+        {% if current_user.email %}
         <button class="btn btn-dark" type="button"  data-bs-toggle="modal"  data-bs-target="#create_post_modal" >
           Click Here
         </button>
@@ -80,18 +80,7 @@
       {% endfor %}
     </div>
 
-    <script>
-      console.log("connected");
-      form_btn = document.getElementById("form_btn");
-      console.log(form_btn);
-      form_btn.onclick = function () {
-        form_btn.style.width = "25%";
-        form_btn.style.height = "auto";
-        document.getElementsByClassName("post-form")[0].style.visibility =
-          "visible";
-        console.log("clicked");
-      };
-    </script>
+
 
     {% endblock %}
   </body>
