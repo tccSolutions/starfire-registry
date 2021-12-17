@@ -11,7 +11,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "akldf*(Oalksf"
-app.config["DATABASE_URL"] = os.environ.get("postgres://auupcfgvfaecgq:a56c7dc4e6bedbf296343a42c7df3e68bc9a970c0238cf8632c5463660c3be81@ec2-52-200-188-218.compute-1.amazonaws.com:5432/d1bdo4ggu88or5","sqlite:///static/data/cars.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///static/data/cars.db")
 
 # Form Settings
 ckeditor = CKEditor(app)
