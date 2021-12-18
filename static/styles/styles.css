@@ -1,6 +1,14 @@
-html{
-    height: 100% !important;
+html, body{
+    height:95% !important;
+    margin:0 !important;
 }
-body{
-    height: 100% !important;
+.wrapper{
+    min-height: 100% !important;
+    margin-bottom: -220px !important;
+}
+
+footer, .push{
+
+    height:75px !important;
+    padding:5em !important;
 }

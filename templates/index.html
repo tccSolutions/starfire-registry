@@ -9,7 +9,8 @@
       integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="../static/styles/styles.css" />
+      <link rel="stylesheet" href="../static/styles/styles.css"/>
+
     <title>61-66 Starfire Registry</title>
   </head>
 
@@ -68,7 +69,7 @@
   {% endfor %}
   <body>
 
-    <div style="height: 100%">
+    <div class="wrapper">
       {% block content %}
       <div class="position-absolute top-50 start-50 translate-middle">
         <img
@@ -78,14 +79,9 @@
         />
       </div>
       {% endblock %}
+      <div class="push"></div>
     </div>
-
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-      crossorigin="anonymous"
-    ></script>
-    <footer class="sticky-bottom w-100 bg-dark p-3" style="margin-top: 5%">
+    <footer class="w-100 bg-dark " style="margin-top: 5%">
       <ul class="nav justify-content-center border-bottom">
         <li class="nav-item">
           <a href="#" class="nav-link px-2 text-muted">Home</a>
@@ -97,7 +93,18 @@
           <a href="#" class="nav-link px-2 text-muted">Gallery</a>
         </li>
       </ul>
-      <p class="text-center text-muted">© {{year}}</p>
+      <div  class="text-center ">
+        <a href="https://www.tccs.tech" class="text-muted">© {{year}} TCCS.TECH</a>
+      </div>
+
     </footer>
-  </body>
+      </body>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+      crossorigin="anonymous"
+    ></script>
+
+
 </html>

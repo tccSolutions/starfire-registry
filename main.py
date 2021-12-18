@@ -31,8 +31,9 @@ def load_user(user_id):
 
 
 # Date Settings
-today = datetime.date.today()
-year = today.year
+now = datetime.datetime.now()
+today = now.strftime("%A, %B %d, %Y @ %I:%M%p")
+year = now.strftime("%Y")
 
 
 # database models
@@ -60,7 +61,7 @@ class ForumPost(db.Model):
     title = db.Column(db.String, nullable=False)
     created_by = db.Column(db.String, nullable=False)
     body = db.Column(db.String, nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.String, nullable=False)
     replies = db.relationship('Replies', backref='ForumPost', lazy=True)
 
     def __repr__(self):
@@ -79,7 +80,7 @@ class Replies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_by = db.Column(db.String, nullable=False)
     body = db.Column(db.String, nullable=False)
-    date = db.Column(db.DateTime)
+    date = db.Column(db.String)
     post_id = db.Column(db.Integer, db.ForeignKey('forumpost.id'))
 
     def __repr__(self):
@@ -172,7 +173,7 @@ def sign_up():
 @app.route('/forum', methods=["GET", "POST"])
 def forum():
     global posts
-    posts = db.session.query(ForumPost).all()
+    posts = ForumPost.query.order_by(ForumPost.id.desc()).all()
     form = AddPostForm()
 
     if request.method == "POST":
@@ -187,7 +188,7 @@ def forum():
             db.session.commit()
         except:
             pass
-        posts = db.session.query(ForumPost).all()
+        posts = ForumPost.query.order_by(ForumPost.id.desc()).all()
         return redirect('forum')
 
     return render_template('forum.html', year=year, posts=posts, form=form)
@@ -203,7 +204,6 @@ def forum_post(id, title):
 @app.route('/add-reply', methods=["POST"])
 def add_reply():
     if request.method == "POST":
-        print(request.form)
         reply = Replies(
             created_by=f"{current_user.first_name} {current_user.last_name} ",
             body=request.form["body"],
@@ -213,7 +213,9 @@ def add_reply():
 
         db.session.add(reply)
         db.session.commit()
-    return redirect('forum')
+        post = ForumPost.query.filter_by(id=reply.post_id).first()
+        print(request.root_url)
+    return redirect(f'forum//{post.title}/{post.id}')
 
 
 @app.route('/gallery')
