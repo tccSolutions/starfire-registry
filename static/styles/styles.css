@@ -1,14 +1,21 @@
-html, body{
-    height:95% !important;
+body{   
+    height:87.5vh;
     margin:0 !important;
 }
 .wrapper{
-    min-height: 100% !important;
-    margin-bottom: -220px !important;
+   display:flex;
+   flex-direction: column;
+   min-height:100%;
+    
+}
+.push{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 5;
+}
+footer{
+    display:flex;   
+    flex-direction: column;
 }
 
-footer, .push{
-
-    height:75px !important;
-    padding:5em !important;
-}
+   
