@@ -1,0 +1,10 @@
+div{
+    display: flex;
+    width: 100%;   
+    justify-content: center;
+}
+div img{
+    width: 50em;
+    height: 50em;
+    object-fit: contain;
+}
