@@ -1,1 +1,1 @@
-web: gunicorn main:app
+web: gunicorn starfire_registry.wsgi
